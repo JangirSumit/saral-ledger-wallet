@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  api:
+    build: ./backend/SaralLedgerAPI
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=/app/data/saralledger.db
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build: ./frontend/saral-ledger-ui
+    ports:
+      - "3000:80"
+    depends_on:
+      - api

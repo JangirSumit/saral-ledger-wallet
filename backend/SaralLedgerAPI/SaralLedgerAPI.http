@@ -1,0 +1,6 @@
+@SaralLedgerAPI_HostAddress = http://localhost:5029
+
+GET {{SaralLedgerAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
