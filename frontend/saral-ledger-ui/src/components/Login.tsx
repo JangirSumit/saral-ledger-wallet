@@ -100,26 +100,14 @@ const Login = ({ onLogin }: LoginProps) => {
             </button>
           </form>
           
-          <div className="demo-accounts">
-            <div className="demo-header">
-              <span className="demo-icon">🎯</span>
-              Demo Accounts
+          <div className="security-notice">
+            <div className="security-text">
+              🔒 Your data is protected with enterprise-grade security
             </div>
-            <div className="demo-grid">
-              <div className="demo-account">
-                <div className="demo-role admin">
-                  <span className="role-icon">👑</span>
-                  Admin
-                </div>
-                <div className="demo-credentials">admin / admin123</div>
-              </div>
-              <div className="demo-account">
-                <div className="demo-role user">
-                  <span className="role-icon">👤</span>
-                  User
-                </div>
-                <div className="demo-credentials">user1 / user123</div>
-              </div>
+            <div className="security-features">
+              <span className="security-item">🛡️ End-to-end encryption</span>
+              <span className="security-item">🔐 Secure authentication</span>
+              <span className="security-item">📊 Audit trails</span>
             </div>
           </div>
         </div>

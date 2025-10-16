@@ -5,6 +5,7 @@ import UserDashboard from './components/UserDashboard';
 import AdminLedgers from './components/AdminLedgers';
 import AdminUsers from './components/AdminUsers';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import type { User } from './types';
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
           </Routes>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }
