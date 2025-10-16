@@ -22,6 +22,7 @@ const Login = ({ onLogin }: LoginProps) => {
     try {
       const response = await authService.login(formData);
       localStorage.setItem('token', response.token);
+      localStorage.setItem('user', JSON.stringify(response.user));
       onLogin(response.token, response.user);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');

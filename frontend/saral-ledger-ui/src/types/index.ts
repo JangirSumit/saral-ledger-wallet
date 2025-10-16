@@ -15,6 +15,8 @@ export interface Ledger {
   createdAt: string;
   approvedAt?: string;
   fileName?: string;
+  contentType?: string;
+  rejectionReason?: string;
   user?: User;
 }
 
@@ -28,7 +30,7 @@ export interface LoginRequest {
   password: string;
 }
 
-export interface LedgerUploadRequest {
+export interface LedgerCreateRequest {
   amount: number;
   description: string;
   file?: File;

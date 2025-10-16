@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, LoginRequest, User, Ledger, LedgerUploadRequest, CreateUserRequest } from '../types';
+import type { AuthResponse, LoginRequest, User, Ledger, LedgerCreateRequest, CreateUserRequest } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -40,8 +40,14 @@ export const userService = {
 };
 
 export const ledgerService = {
-  uploadLedger: async (data: LedgerUploadRequest): Promise<{ message: string; ledgerId: number }> => {
-    const response = await api.post('/ledger/upload', data);
+  createLedger: async (data: LedgerCreateRequest): Promise<{ message: string; ledgerId: number }> => {
+    const formData = new FormData();
+    formData.append('amount', data.amount.toString());
+    formData.append('description', data.description);
+    if (data.file) {
+      formData.append('file', data.file);
+    }
+    const response = await api.post('/ledger/create', formData);
     return response.data;
   },
 
@@ -70,8 +76,14 @@ export const ledgerService = {
     return response.data;
   },
 
-  updateLedger: async (id: number, data: LedgerUploadRequest): Promise<{ message: string }> => {
-    const response = await api.put(`/ledger/${id}`, data);
+  updateLedger: async (id: number, data: LedgerCreateRequest): Promise<{ message: string }> => {
+    const formData = new FormData();
+    formData.append('amount', data.amount.toString());
+    formData.append('description', data.description);
+    if (data.file) {
+      formData.append('file', data.file);
+    }
+    const response = await api.put(`/ledger/${id}`, formData);
     return response.data;
   },
 

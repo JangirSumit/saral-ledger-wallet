@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ledgerService, userService } from '../services/api';
-import type { Ledger, User, LedgerUploadRequest } from '../types';
+import type { Ledger, User, LedgerCreateRequest } from '../types';
 import UserStats from './UserStats';
-import LedgerUploadModal from './LedgerUploadModal';
+import LedgerCreateModal from './LedgerCreateModal';
 import LedgerTable from './LedgerTable';
 import ConfirmDialog from './ConfirmDialog';
 
@@ -43,18 +43,18 @@ const UserDashboard = ({ user: initialUser }: UserDashboardProps) => {
     }
   };
 
-  const handleUpload = async (uploadData: LedgerUploadRequest) => {
+  const handleCreate = async (createData: LedgerCreateRequest) => {
     setLoading(true);
     setMessage('');
 
     try {
       if (editingLedger) {
-        await ledgerService.updateLedger(editingLedger.id, uploadData);
+        await ledgerService.updateLedger(editingLedger.id, createData);
         setMessage('Ledger updated successfully!');
         setEditingLedger(null);
       } else {
-        await ledgerService.uploadLedger(uploadData);
-        setMessage('Ledger uploaded successfully! Waiting for admin approval.');
+        await ledgerService.createLedger(createData);
+        setMessage('Ledger created successfully! Waiting for admin approval.');
       }
       setShowUploadForm(false);
       loadLedgers();
@@ -118,18 +118,18 @@ const UserDashboard = ({ user: initialUser }: UserDashboardProps) => {
             className="btn btn-glass rounded-pill px-4 py-2"
             onClick={() => setShowUploadForm(true)}
           >
-            ➕ Upload New Ledger
+            ➕ Create New Ledger
           </button>
         </div>
       )}
 
-      <LedgerUploadModal
+      <LedgerCreateModal
         show={showUploadForm}
         onClose={() => {
           setShowUploadForm(false);
           setEditingLedger(null);
         }}
-        onSubmit={handleUpload}
+        onSubmit={handleCreate}
         loading={loading}
         editData={editingLedger}
       />

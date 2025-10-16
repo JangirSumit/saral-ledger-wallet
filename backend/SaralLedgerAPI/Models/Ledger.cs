@@ -23,6 +23,14 @@ namespace SaralLedgerAPI.Models
         
         public int? ApprovedBy { get; set; }
         
+        public string? FileName { get; set; }
+        
+        public byte[]? FileData { get; set; }
+        
+        public string? ContentType { get; set; }
+        
+        public string? RejectionReason { get; set; }
+        
         public User User { get; set; } = null!;
     }
 }

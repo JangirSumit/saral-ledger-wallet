@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
-import type { LedgerUploadRequest, Ledger } from '../types';
+import type { LedgerCreateRequest, Ledger } from '../types';
 
-interface LedgerUploadModalProps {
+interface LedgerCreateModalProps {
   show: boolean;
   onClose: () => void;
-  onSubmit: (data: LedgerUploadRequest) => Promise<void>;
+  onSubmit: (data: LedgerCreateRequest) => Promise<void>;
   loading: boolean;
   editData?: Ledger | null;
 }
 
-const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: LedgerUploadModalProps) => {
-  const [uploadData, setUploadData] = useState<LedgerUploadRequest>({
+const LedgerCreateModal = ({ show, onClose, onSubmit, loading, editData }: LedgerCreateModalProps) => {
+  const [createData, setCreateData] = useState<LedgerCreateRequest>({
     amount: 0,
     description: '',
     file: undefined,
@@ -18,20 +18,20 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
 
   useEffect(() => {
     if (editData) {
-      setUploadData({
+      setCreateData({
         amount: editData.amount,
         description: editData.description,
         file: undefined,
       });
     } else {
-      setUploadData({ amount: 0, description: '', file: undefined });
+      setCreateData({ amount: 0, description: '', file: undefined });
     }
   }, [editData, show]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(uploadData);
-    setUploadData({ amount: 0, description: '', file: undefined });
+    await onSubmit(createData);
+    setCreateData({ amount: 0, description: '', file: undefined });
   };
 
   if (!show) return null;
@@ -41,7 +41,7 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
       <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">{editData ? '✏️ Edit Ledger' : '📝 Upload New Ledger'}</h5>
+            <h5 className="modal-title">{editData ? '✏️ Edit Ledger' : '📝 Create New Ledger'}</h5>
             <button type="button" className="btn-close" onClick={onClose}>✕</button>
           </div>
           <div className="modal-body">
@@ -53,8 +53,8 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
                     type="number"
                     step="0.01"
                     className="form-control form-control-lg rounded-pill"
-                    value={uploadData.amount}
-                    onChange={(e) => setUploadData({ ...uploadData, amount: parseFloat(e.target.value) })}
+                    value={createData.amount || ''}
+                    onChange={(e) => setCreateData({ ...createData, amount: parseFloat(e.target.value) || 0 })}
                     placeholder="Enter amount"
                     required
                   />
@@ -64,8 +64,8 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
                   <textarea
                     className="form-control form-control-lg rounded-3"
                     rows={3}
-                    value={uploadData.description}
-                    onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
+                    value={createData.description}
+                    onChange={(e) => setCreateData({ ...createData, description: e.target.value })}
                     placeholder="Enter transaction details (bank name, account number, transaction ID, etc.)"
                     required
                   />
@@ -80,21 +80,26 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
                       type="file"
                       className="form-control form-control-lg"
                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      onChange={(e) => setUploadData({ ...uploadData, file: e.target.files?.[0] })}
+                      onChange={(e) => setCreateData({ ...createData, file: e.target.files?.[0] || undefined })}
                       required={!editData}
                     />
                     <small className="text-muted mt-1 d-block">
                       📎 Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
-                      {editData && <><br/>📝 Leave empty to keep existing file</>}
+                      {editData && (
+                        <span>
+                          <br/>
+                          📝 Leave empty to keep existing file
+                        </span>
+                      )}
                     </small>
-                    {uploadData.file && (
+                    {createData.file && (
                       <div className="selected-file mt-2">
                         <span className="badge bg-primary rounded-pill">
-                          📄 {uploadData.file.name}
+                          📄 {createData.file.name}
                         </span>
                       </div>
                     )}
-                    {editData?.fileName && !uploadData.file && (
+                    {editData?.fileName && !createData.file && (
                       <div className="existing-file mt-2">
                         <span className="badge bg-success rounded-pill">
                           📄 {editData.fileName} (Current file)
@@ -109,7 +114,7 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
                   Cancel
                 </button>
                 <button type="submit" className="btn btn-primary btn-lg rounded-pill px-5" disabled={loading}>
-                  {loading ? '⏳ Processing...' : editData ? '💾 Update Ledger' : '🚀 Upload Ledger'}
+                  {loading ? '⏳ Processing...' : editData ? '💾 Update Ledger' : '🚀 Create Ledger'}
                 </button>
               </div>
             </form>
@@ -120,4 +125,4 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
   );
 };
 
-export default LedgerUploadModal;
+export default LedgerCreateModal;
