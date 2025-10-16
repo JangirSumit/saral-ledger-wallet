@@ -13,6 +13,7 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [selectedLedgerId, setSelectedLedgerId] = useState<number | null>(null);
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     loadAllLedgers();
@@ -82,6 +83,13 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
+  const filteredLedgers = allLedgers.filter(ledger => 
+    ledger.id.toString().includes(filter) ||
+    ledger.user?.username.toLowerCase().includes(filter.toLowerCase()) ||
+    ledger.description.toLowerCase().includes(filter.toLowerCase()) ||
+    ledger.status.toLowerCase().includes(filter.toLowerCase())
+  );
+
   return (
     <>
       {message && (
@@ -92,7 +100,17 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
 
       <div className="table-glass">
         <div className="p-4 border-bottom">
-          <h5 className="mb-0 fw-bold">📋 All Ledgers</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0 fw-bold">📋 All Ledgers</h5>
+            <input
+              type="text"
+              className="form-control rounded-pill"
+              style={{ maxWidth: '300px' }}
+              placeholder="Search by ID, user, description, status..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
         </div>
         <div className="p-0">
           {allLedgers.length === 0 ? (
@@ -108,6 +126,7 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
                 <table className="table table-hover mb-0">
                   <thead className="bg-light">
                     <tr>
+                      <th className="fw-semibold py-2">ID</th>
                       <th className="fw-semibold py-2">User</th>
                       <th className="fw-semibold py-2">Amount</th>
                       <th className="fw-semibold py-2">Description</th>
@@ -118,8 +137,9 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {allLedgers.map((ledger) => (
+                    {filteredLedgers.map((ledger) => (
                       <tr key={ledger.id}>
+                        <td className="py-2 text-muted small">#{ledger.id}</td>
                         <td className="py-2 fw-semibold">{ledger.user?.username}</td>
                         <td className="py-2">
                           <span className="fw-bold text-success fs-5">₹{ledger.amount.toFixed(2)}</span>
@@ -172,12 +192,13 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
 
               {/* Mobile Cards */}
               <div className="d-md-none">
-                {allLedgers.map((ledger) => (
+                {filteredLedgers.map((ledger) => (
                   <div key={ledger.id} className="ledger-card">
                     <div className="ledger-card-header" onClick={() => toggleCard(ledger.id)}>
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
-                          <span className="fw-bold text-success fs-5">₹{ledger.amount.toFixed(2)}</span>
+                          <span className="text-muted small">#{ledger.id}</span>
+                          <span className="fw-bold text-success fs-5 ms-2">₹{ledger.amount.toFixed(2)}</span>
                           <span className={`badge rounded-pill ms-2 px-2 py-1 ${
                             ledger.status === 'Approved' ? 'bg-success' : 
                             ledger.status === 'Rejected' ? 'bg-danger' : 'bg-warning text-dark'

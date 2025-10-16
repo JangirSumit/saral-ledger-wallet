@@ -18,6 +18,7 @@ const AdminUsers = ({ }: AdminUsersProps) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
+  const [filter, setFilter] = useState('');
 
   useEffect(() => {
     loadUsers();
@@ -69,6 +70,13 @@ const AdminUsers = ({ }: AdminUsersProps) => {
       setLoading(false);
     }
   };
+
+  const filteredUsers = users.filter(user => 
+    user.id.toString().includes(filter) ||
+    user.username.toLowerCase().includes(filter.toLowerCase()) ||
+    (user.email?.toLowerCase().includes(filter.toLowerCase()) || false) ||
+    user.role.toLowerCase().includes(filter.toLowerCase())
+  );
 
   return (
     <>
@@ -184,13 +192,24 @@ const AdminUsers = ({ }: AdminUsersProps) => {
 
       <div className="table-glass">
         <div className="p-4 border-bottom">
-          <h5 className="mb-0 fw-bold">👥 All Users</h5>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h5 className="mb-0 fw-bold">👥 All Users</h5>
+            <input
+              type="text"
+              className="form-control rounded-pill"
+              style={{ maxWidth: '300px' }}
+              placeholder="Search by ID, username, email, role..."
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+            />
+          </div>
         </div>
         <div className="p-0">
           <div className="table-responsive">
             <table className="table table-hover mb-0">
               <thead className="bg-light">
                 <tr>
+                  <th className="fw-semibold py-2">ID</th>
                   <th className="fw-semibold py-2">Username</th>
                   <th className="fw-semibold py-2">Email</th>
                   <th className="fw-semibold py-2">Role</th>
@@ -198,8 +217,9 @@ const AdminUsers = ({ }: AdminUsersProps) => {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
+                {filteredUsers.map((u) => (
                   <tr key={u.id}>
+                    <td className="py-2 text-muted small">#{u.id}</td>
                     <td className="py-2 fw-semibold">{u.username}</td>
                     <td className="py-2">{u.email}</td>
                     <td className="py-2">
