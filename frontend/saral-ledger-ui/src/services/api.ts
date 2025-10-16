@@ -64,4 +64,26 @@ export const ledgerService = {
     const response = await api.post(`/ledger/reject/${id}`);
     return response.data;
   },
+
+  deleteLedger: async (id: number): Promise<{ message: string }> => {
+    const response = await api.delete(`/ledger/${id}`);
+    return response.data;
+  },
+
+  updateLedger: async (id: number, data: LedgerUploadRequest): Promise<{ message: string }> => {
+    const response = await api.put(`/ledger/${id}`, data);
+    return response.data;
+  },
+};
+
+export const adminService = {
+  deleteUser: async (id: number): Promise<{ message: string }> => {
+    const response = await api.delete(`/user/${id}`);
+    return response.data;
+  },
+
+  updateUser: async (id: number, data: Partial<CreateUserRequest>): Promise<{ message: string }> => {
+    const response = await api.put(`/user/${id}`, data);
+    return response.data;
+  },
 };

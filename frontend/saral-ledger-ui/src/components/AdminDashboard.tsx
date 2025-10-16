@@ -21,6 +21,27 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [activeTab, setActiveTab] = useState('ledgers');
+  const [copyMessage, setCopyMessage] = useState('');
+
+  const generatePassword = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCreateUserData({ ...createUserData, password });
+  };
+
+  const copyPassword = async () => {
+    try {
+      await navigator.clipboard.writeText(createUserData.password);
+      setCopyMessage('Password copied!');
+      setTimeout(() => setCopyMessage(''), 2000);
+    } catch (err) {
+      setCopyMessage('Copy failed');
+      setTimeout(() => setCopyMessage(''), 2000);
+    }
+  };
 
   useEffect(() => {
     loadPendingLedgers();
@@ -100,57 +121,108 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
             </div>
           )}
 
+          {/* Create User Modal */}
           {activeTab === 'users' && showCreateUser && (
-            <div className="glass-card p-4 mb-4">
-              <h5 className="mb-4">👤 Create New User</h5>
-                <form onSubmit={handleCreateUser}>
-                  <div className="row">
-                    <div className="col-md-6 mb-3">
-                      <label className="form-label">Username</label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={createUserData.username}
-                        onChange={(e) => setCreateUserData({ ...createUserData, username: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label className="form-label">Email</label>
-                      <input
-                        type="email"
-                        className="form-control"
-                        value={createUserData.email}
-                        onChange={(e) => setCreateUserData({ ...createUserData, email: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label className="form-label">Password</label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        value={createUserData.password}
-                        onChange={(e) => setCreateUserData({ ...createUserData, password: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="col-md-6 mb-3">
-                      <label className="form-label">Role</label>
-                      <select
-                        className="form-select"
-                        value={createUserData.role}
-                        onChange={(e) => setCreateUserData({ ...createUserData, role: e.target.value })}
-                      >
-                        <option value="User">User</option>
-                        <option value="Admin">Admin</option>
-                      </select>
-                    </div>
+            <div className="modal-overlay" onClick={() => setShowCreateUser(false)}>
+              <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">👤 Create New User</h5>
+                    <button 
+                      type="button" 
+                      className="btn-close"
+                      onClick={() => setShowCreateUser(false)}
+                    >
+                      ✕
+                    </button>
                   </div>
-                  <button type="submit" className="btn btn-primary btn-lg rounded-pill px-5" disabled={loading}>
-                    {loading ? '⏳ Creating...' : '🚀 Create User'}
-                  </button>
-                </form>
+                  <div className="modal-body">
+                    <form onSubmit={handleCreateUser}>
+                      <div className="row">
+                        <div className="col-12 mb-3">
+                          <label className="form-label fw-semibold">Username</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-lg rounded-pill"
+                            value={createUserData.username}
+                            onChange={(e) => setCreateUserData({ ...createUserData, username: e.target.value })}
+                            placeholder="Enter username"
+                            required
+                          />
+                        </div>
+                        <div className="col-12 mb-3">
+                          <label className="form-label fw-semibold">Email</label>
+                          <input
+                            type="email"
+                            className="form-control form-control-lg rounded-pill"
+                            value={createUserData.email}
+                            onChange={(e) => setCreateUserData({ ...createUserData, email: e.target.value })}
+                            placeholder="Enter email address"
+                            required
+                          />
+                        </div>
+                        <div className="col-12 mb-3">
+                          <label className="form-label fw-semibold">Password</label>
+                          <div className="password-input-wrapper">
+                            <input
+                              type="text"
+                              className="form-control form-control-lg rounded-pill"
+                              value={createUserData.password}
+                              onChange={(e) => setCreateUserData({ ...createUserData, password: e.target.value })}
+                              placeholder="Enter password or generate one"
+                              required
+                            />
+                            <div className="password-actions">
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary btn-sm rounded-pill me-2"
+                                onClick={generatePassword}
+                              >
+                                🎲 Generate
+                              </button>
+                              {createUserData.password && (
+                                <button
+                                  type="button"
+                                  className="btn btn-outline-secondary btn-sm rounded-pill"
+                                  onClick={copyPassword}
+                                >
+                                  📋 Copy
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          {copyMessage && (
+                            <small className="text-success mt-1 d-block">{copyMessage}</small>
+                          )}
+                        </div>
+                        <div className="col-12 mb-3">
+                          <label className="form-label fw-semibold">Role</label>
+                          <select
+                            className="form-select form-select-lg rounded-pill"
+                            value={createUserData.role}
+                            onChange={(e) => setCreateUserData({ ...createUserData, role: e.target.value })}
+                          >
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div className="modal-footer">
+                        <button 
+                          type="button" 
+                          className="btn btn-secondary rounded-pill px-4"
+                          onClick={() => setShowCreateUser(false)}
+                        >
+                          Cancel
+                        </button>
+                        <button type="submit" className="btn btn-primary btn-lg rounded-pill px-5" disabled={loading}>
+                          {loading ? '⏳ Creating...' : '🚀 Create User'}
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -177,23 +249,23 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
                     <table className="table table-hover mb-0">
                       <thead className="bg-light">
                         <tr>
-                          <th className="fw-semibold py-3">User</th>
-                          <th className="fw-semibold py-3">Amount</th>
-                          <th className="fw-semibold py-3">Description</th>
-                          <th className="fw-semibold py-3">Created</th>
-                          <th className="fw-semibold py-3">Actions</th>
+                          <th className="fw-semibold py-2">User</th>
+                          <th className="fw-semibold py-2">Amount</th>
+                          <th className="fw-semibold py-2">Description</th>
+                          <th className="fw-semibold py-2">Created</th>
+                          <th className="fw-semibold py-2">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         {pendingLedgers.map((ledger) => (
                           <tr key={ledger.id}>
-                            <td className="py-3 fw-semibold">{ledger.user?.username}</td>
-                            <td className="py-3">
-                              <span className="fw-bold text-success fs-5">${ledger.amount.toFixed(2)}</span>
+                            <td className="py-2 fw-semibold">{ledger.user?.username}</td>
+                            <td className="py-2">
+                              <span className="fw-bold text-success fs-5">₹{ledger.amount.toFixed(2)}</span>
                             </td>
-                            <td className="py-3">{ledger.description}</td>
-                            <td className="py-3 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
-                            <td className="py-3">
+                            <td className="py-2">{ledger.description}</td>
+                            <td className="py-2 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
+                            <td className="py-2">
                               <button
                                 className="btn btn-success btn-sm rounded-pill me-2 px-3"
                                 onClick={() => handleApprove(ledger.id)}

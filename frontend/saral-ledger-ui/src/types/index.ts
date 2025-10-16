@@ -30,6 +30,7 @@ export interface LoginRequest {
 export interface LedgerUploadRequest {
   amount: number;
   description: string;
+  file?: File;
 }
 
 export interface CreateUserRequest {

@@ -79,7 +79,7 @@ const Navbar = ({ user, onLogout, activeTab, onTabChange }: NavbarProps) => {
                   <div className="fw-bold fs-5">{user.username}</div>
                   <div className="text-muted small">{user.email}</div>
                   {user.role === 'User' && (
-                    <div className="text-success fw-bold fs-4 mt-2">💰 ${user.walletAmount.toFixed(2)}</div>
+                    <div className="text-success fw-bold fs-4 mt-2">💰 ₹{user.walletAmount.toFixed(2)}</div>
                   )}
                 </div>
                 <hr />
