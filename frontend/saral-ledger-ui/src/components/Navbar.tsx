@@ -1,16 +1,28 @@
 import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import type { User } from '../types';
 
 interface NavbarProps {
   user: User;
   onLogout: () => void;
-  activeTab: string;
-  onTabChange: (tab: string) => void;
 }
 
-const Navbar = ({ user, onLogout, activeTab, onTabChange }: NavbarProps) => {
+const Navbar = ({ user, onLogout }: NavbarProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  const getActiveTab = () => {
+    if (location.pathname === '/users') return 'users';
+    if (location.pathname === '/ledgers') return 'ledgers';
+    return 'home';
+  };
+  
+  const handleTabChange = (tab: string) => {
+    navigate(`/${tab}`);
+    setShowMobileMenu(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -35,33 +47,35 @@ const Navbar = ({ user, onLogout, activeTab, onTabChange }: NavbarProps) => {
         
         <div className="d-flex align-items-center">
           {/* Desktop Menu */}
-          <div className="d-none d-md-flex me-4">
-            <button
-              className={`tab-button ${activeTab === 'ledgers' ? 'active' : ''}`}
-              onClick={() => onTabChange('ledgers')}
-            >
-              📊 Ledgers
-            </button>
-            {user.role === 'Admin' && (
+          {user.role === 'Admin' && (
+            <div className="d-none d-md-flex me-4">
               <button
-                className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
-                onClick={() => onTabChange('users')}
+                className={`tab-button ${getActiveTab() === 'ledgers' ? 'active' : ''}`}
+                onClick={() => handleTabChange('ledgers')}
+              >
+                📊 Ledgers
+              </button>
+              <button
+                className={`tab-button ${getActiveTab() === 'users' ? 'active' : ''}`}
+                onClick={() => handleTabChange('users')}
               >
                 👥 Users
               </button>
-            )}
-          </div>
+            </div>
+          )}
           
           {/* Mobile Burger Menu */}
-          <button
-            className="btn d-md-none me-3 burger-menu"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowMobileMenu(!showMobileMenu);
-            }}
-          >
-            ☰
-          </button>
+          {user.role === 'Admin' && (
+            <button
+              className="btn d-md-none me-3 burger-menu"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowMobileMenu(!showMobileMenu);
+              }}
+            >
+              ☰
+            </button>
+          )}
           
           <div className="position-relative">
             <button
@@ -92,29 +106,21 @@ const Navbar = ({ user, onLogout, activeTab, onTabChange }: NavbarProps) => {
         </div>
         
         {/* Mobile Menu Dropdown */}
-        {showMobileMenu && (
+        {showMobileMenu && user.role === 'Admin' && (
           <div className="mobile-menu position-absolute w-100 start-0 mt-2" style={{top: '100%', zIndex: 1040}}>
             <div className="mobile-menu-content p-3">
               <button
-                className={`mobile-tab-button w-100 mb-2 ${activeTab === 'ledgers' ? 'active' : ''}`}
-                onClick={() => {
-                  onTabChange('ledgers');
-                  setShowMobileMenu(false);
-                }}
+                className={`mobile-tab-button w-100 mb-2 ${getActiveTab() === 'ledgers' ? 'active' : ''}`}
+                onClick={() => handleTabChange('ledgers')}
               >
                 📊 Ledgers
               </button>
-              {user.role === 'Admin' && (
-                <button
-                  className={`mobile-tab-button w-100 ${activeTab === 'users' ? 'active' : ''}`}
-                  onClick={() => {
-                    onTabChange('users');
-                    setShowMobileMenu(false);
-                  }}
-                >
-                  👥 Users
-                </button>
-              )}
+              <button
+                className={`mobile-tab-button w-100 ${getActiveTab() === 'users' ? 'active' : ''}`}
+                onClick={() => handleTabChange('users')}
+              >
+                👥 Users
+              </button>
             </div>
           </div>
         )}
