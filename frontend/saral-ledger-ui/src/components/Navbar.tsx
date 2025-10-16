@@ -39,7 +39,10 @@ const Navbar = ({ user, onLogout }: NavbarProps) => {
     <nav className="navbar navbar-light navbar-custom">
       <div className="container-fluid px-4">
         <div className="d-flex align-items-center">
-          <span className="navbar-brand-custom mb-0">💰 SaralPay</span>
+          <span className="navbar-brand-custom mb-0">
+            <img src="/icon_192.png" alt="SaralPay" style={{width: '32px', height: '32px', marginRight: '8px'}} />
+            SaralPay
+          </span>
           <span className={`badge rounded-pill ms-3 ${user.role === 'Admin' ? 'bg-danger' : 'bg-primary'}`}>
             {user.role}
           </span>
