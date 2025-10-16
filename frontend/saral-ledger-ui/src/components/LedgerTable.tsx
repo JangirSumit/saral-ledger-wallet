@@ -56,6 +56,11 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
                         }`}>
                           {ledger.status === 'Approved' ? '✅' : ledger.status === 'Rejected' ? '❌' : '⏳'} {ledger.status === 'Pending' ? 'Pending for Approval' : ledger.status}
                         </span>
+                        {ledger.status === 'Rejected' && ledger.rejectionReason && (
+                          <div className="text-danger small mt-1">
+                            <strong>Reason:</strong> {ledger.rejectionReason}
+                          </div>
+                        )}
                       </td>
                       <td className="py-2 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
                       <td className="py-2">
@@ -124,6 +129,13 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
                         <strong>Description:</strong>
                         <div className="text-muted small">{ledger.description}</div>
                       </div>
+                      
+                      {ledger.status === 'Rejected' && ledger.rejectionReason && (
+                        <div className="mb-2">
+                          <strong className="text-danger">Rejection Reason:</strong>
+                          <div className="text-danger small">{ledger.rejectionReason}</div>
+                        </div>
+                      )}
                       
                       <div className="d-flex gap-2 flex-wrap">
                         {ledger.fileName && (

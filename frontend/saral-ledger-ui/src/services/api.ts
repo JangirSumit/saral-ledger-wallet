@@ -56,6 +56,11 @@ export const ledgerService = {
     return response.data;
   },
 
+  getAllLedgers: async (): Promise<Ledger[]> => {
+    const response = await api.get('/ledger/all');
+    return response.data;
+  },
+
   getPendingLedgers: async (): Promise<Ledger[]> => {
     const response = await api.get('/ledger/pending');
     return response.data;
@@ -66,8 +71,8 @@ export const ledgerService = {
     return response.data;
   },
 
-  rejectLedger: async (id: number): Promise<{ message: string }> => {
-    const response = await api.post(`/ledger/reject/${id}`);
+  rejectLedger: async (id: number, reason: string): Promise<{ message: string }> => {
+    const response = await api.post(`/ledger/reject/${id}`, { reason });
     return response.data;
   },
 

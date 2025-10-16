@@ -80,6 +80,31 @@ namespace SaralLedgerAPI.Controllers
             return Ok(ledgers);
         }
 
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllLedgers()
+        {
+            var ledgers = await _context.Ledgers
+                .Include(l => l.User)
+                .OrderByDescending(l => l.CreatedAt)
+                .Select(l => new {
+                    l.Id,
+                    l.UserId,
+                    l.Amount,
+                    l.Description,
+                    l.Status,
+                    l.CreatedAt,
+                    l.ApprovedAt,
+                    l.FileName,
+                    l.ContentType,
+                    l.RejectionReason,
+                    User = new { l.User.Id, l.User.Username, l.User.Email, l.User.Role, l.User.WalletAmount }
+                })
+                .ToListAsync();
+
+            return Ok(ledgers);
+        }
+
         [HttpGet("pending")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPendingLedgers()
@@ -133,6 +158,7 @@ namespace SaralLedgerAPI.Controllers
 
         [HttpPost("reject/{id}")]
         [Authorize(Roles = "Admin")]
+        [Consumes("application/json")]
         public async Task<IActionResult> RejectLedger(int id, [FromBody] RejectLedgerRequest request)
         {
             var adminId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
