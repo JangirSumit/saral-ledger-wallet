@@ -935,3 +935,12 @@ html, body {
     width: 100%;
   }
 }
+
+.cursor-pointer {
+  cursor: pointer;
+  user-select: none;
+}
+
+.cursor-pointer:hover {
+  background-color: rgba(0, 123, 255, 0.1) !important;
+}

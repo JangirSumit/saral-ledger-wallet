@@ -19,6 +19,8 @@ const AdminUsers = ({ }: AdminUsersProps) => {
   const [message, setMessage] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
   const [filter, setFilter] = useState('');
+  const [sortField, setSortField] = useState<string>('id');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     loadUsers();
@@ -71,12 +73,37 @@ const AdminUsers = ({ }: AdminUsersProps) => {
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.id.toString().includes(filter) ||
-    user.username.toLowerCase().includes(filter.toLowerCase()) ||
-    (user.email?.toLowerCase().includes(filter.toLowerCase()) || false) ||
-    user.role.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const filteredAndSortedUsers = users
+    .filter(user => 
+      user.id.toString().includes(filter) ||
+      user.username.toLowerCase().includes(filter.toLowerCase()) ||
+      (user.email?.toLowerCase().includes(filter.toLowerCase()) || false) ||
+      user.role.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      let aVal: any = a[sortField as keyof typeof a];
+      let bVal: any = b[sortField as keyof typeof b];
+      
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      
+      if (sortDirection === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
 
   return (
     <>
@@ -209,15 +236,25 @@ const AdminUsers = ({ }: AdminUsersProps) => {
             <table className="table table-hover mb-0">
               <thead className="bg-light">
                 <tr>
-                  <th className="fw-semibold py-2">ID</th>
-                  <th className="fw-semibold py-2">Username</th>
-                  <th className="fw-semibold py-2">Email</th>
-                  <th className="fw-semibold py-2">Role</th>
-                  <th className="fw-semibold py-2">Wallet</th>
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('id')}>
+                    ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('username')}>
+                    Username {sortField === 'username' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('email')}>
+                    Email {sortField === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('role')}>
+                    Role {sortField === 'role' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('walletAmount')}>
+                    Wallet {sortField === 'walletAmount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map((u) => (
+                {filteredAndSortedUsers.map((u) => (
                   <tr key={u.id}>
                     <td className="py-2 text-muted small">#{u.id}</td>
                     <td className="py-2 fw-semibold">{u.username}</td>

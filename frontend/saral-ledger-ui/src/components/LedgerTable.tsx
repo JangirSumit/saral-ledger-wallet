@@ -12,16 +12,43 @@ interface LedgerTableProps {
 const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = false }: LedgerTableProps) => {
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
   const [filter, setFilter] = useState('');
+  const [sortField, setSortField] = useState<string>('id');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const toggleCard = (id: number) => {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  const filteredLedgers = ledgers.filter(ledger => 
-    ledger.id.toString().includes(filter) ||
-    ledger.description.toLowerCase().includes(filter.toLowerCase()) ||
-    ledger.status.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const filteredAndSortedLedgers = ledgers
+    .filter(ledger => 
+      ledger.id.toString().includes(filter) ||
+      ledger.description.toLowerCase().includes(filter.toLowerCase()) ||
+      ledger.status.toLowerCase().includes(filter.toLowerCase())
+    )
+    .sort((a, b) => {
+      let aVal: any = a[sortField as keyof typeof a];
+      let bVal: any = b[sortField as keyof typeof b];
+      
+      if (typeof aVal === 'string') {
+        aVal = aVal.toLowerCase();
+        bVal = bVal.toLowerCase();
+      }
+      
+      if (sortDirection === 'asc') {
+        return aVal > bVal ? 1 : -1;
+      } else {
+        return aVal < bVal ? 1 : -1;
+      }
+    });
 
   return (
     <div className="table-glass">
@@ -52,17 +79,27 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
               <table className="table table-hover mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th className="fw-semibold py-2">ID</th>
-                    <th className="fw-semibold py-2">Amount</th>
-                    <th className="fw-semibold py-2">Description</th>
-                    <th className="fw-semibold py-2">Status</th>
-                    <th className="fw-semibold py-2">Date</th>
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('id')}>
+                      ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('amount')}>
+                      Amount {sortField === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('description')}>
+                      Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('status')}>
+                      Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('createdAt')}>
+                      Date {sortField === 'createdAt' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
                     <th className="fw-semibold py-2">File</th>
                     {showActions && <th className="fw-semibold py-2">Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredLedgers.map((ledger) => (
+                  {filteredAndSortedLedgers.map((ledger) => (
                     <tr key={ledger.id}>
                       <td className="py-2 text-muted small">#{ledger.id}</td>
                       <td className="py-2">
@@ -123,7 +160,7 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
 
             {/* Mobile Cards */}
             <div className="d-md-none">
-              {filteredLedgers.map((ledger) => (
+              {filteredAndSortedLedgers.map((ledger) => (
                 <div key={ledger.id} className="ledger-card">
                   <div className="ledger-card-header" onClick={() => toggleCard(ledger.id)}>
                     <div className="d-flex justify-content-between align-items-center">
