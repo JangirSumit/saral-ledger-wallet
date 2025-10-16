@@ -36,7 +36,7 @@ const Login = ({ onLogin }: LoginProps) => {
         <div className="login-card">
           <div className="login-header">
             <div className="brand-logo">
-              <div className="logo-icon">💰</div>
+              <img src="/icon_192.png" alt="SaralPay" className="logo-icon" style={{width: '64px', height: '64px'}} />
               <h1 className="brand-title">SaralPay</h1>
             </div>
             <p className="login-subtitle">Upload ledgers, earn wallet money - Simple & Fast!</p>
