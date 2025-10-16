@@ -501,6 +501,37 @@ html, body {
   padding-right: 140px;
 }
 
+/* Mobile Ledger Cards */
+.ledger-card {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.ledger-card:last-child {
+  border-bottom: none;
+}
+
+.ledger-card-header {
+  padding: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.ledger-card-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.ledger-card-body {
+  padding: 0 16px 16px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: #6c757d;
+  transition: transform 0.2s ease;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
