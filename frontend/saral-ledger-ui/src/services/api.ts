@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { AuthResponse, LoginRequest, User, Ledger, LedgerUploadRequest, CreateUserRequest } from '../types';
+import type { AuthResponse, LoginRequest, User, Ledger, LedgerUploadRequest, CreateUserRequest } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://localhost:7000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,

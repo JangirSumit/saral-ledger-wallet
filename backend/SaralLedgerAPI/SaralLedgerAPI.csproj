@@ -35,6 +35,21 @@
     <Exec Command="npm install" WorkingDirectory="$(SpaRoot)" />
   </Target>
 
+  <Target Name="BuildUI" BeforeTargets="Build" Condition=" Exists('$(SpaRoot)') ">
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+    
+    <!-- Clean wwwroot -->
+    <RemoveDir Directories="wwwroot" />
+    <MakeDir Directories="wwwroot" />
+    
+    <!-- Copy dist files to wwwroot -->
+    <ItemGroup>
+      <DistFiles Include="$(SpaRoot)dist/**/*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DistFiles)" DestinationFiles="@(DistFiles->'wwwroot/%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
+
   <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish" Condition=" Exists('$(SpaRoot)') ">
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
     <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />

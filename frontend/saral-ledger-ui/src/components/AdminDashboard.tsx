@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ledgerService, userService } from '../services/api';
-import { Ledger, User, CreateUserRequest } from '../types';
+import type { Ledger, User, CreateUserRequest } from '../types';
+import Navbar from './Navbar';
 
 interface AdminDashboardProps {
   user: User;
@@ -19,6 +20,7 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('ledgers');
 
   useEffect(() => {
     loadPendingLedgers();
@@ -83,146 +85,176 @@ const AdminDashboard = ({ user, onLogout }: AdminDashboardProps) => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>Admin Dashboard</h2>
-        <button onClick={onLogout} style={{ padding: '8px 16px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}>
-          Logout
-        </button>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <button
-          onClick={() => setShowCreateUser(!showCreateUser)}
-          style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px' }}
-        >
-          {showCreateUser ? 'Cancel' : 'Create New User'}
-        </button>
-      </div>
-
-      {showCreateUser && (
-        <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-          <h4>Create New User</h4>
-          <form onSubmit={handleCreateUser}>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Username:</label>
-              <input
-                type="text"
-                value={createUserData.username}
-                onChange={(e) => setCreateUserData({ ...createUserData, username: e.target.value })}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Email:</label>
-              <input
-                type="email"
-                value={createUserData.email}
-                onChange={(e) => setCreateUserData({ ...createUserData, email: e.target.value })}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Password:</label>
-              <input
-                type="password"
-                value={createUserData.password}
-                onChange={(e) => setCreateUserData({ ...createUserData, password: e.target.value })}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
-            </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Role:</label>
-              <select
-                value={createUserData.role}
-                onChange={(e) => setCreateUserData({ ...createUserData, role: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+    <div className="App">
+      <Navbar user={user} onLogout={onLogout} activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="content-area">
+        <div className="container-fluid px-3 py-3">
+          {activeTab === 'users' && (
+            <div className="mb-4">
+              <button
+                className={`btn ${showCreateUser ? 'btn-secondary' : 'btn-glass'} rounded-pill px-4 py-2`}
+                onClick={() => setShowCreateUser(!showCreateUser)}
               >
-                <option value="User">User</option>
-                <option value="Admin">Admin</option>
-              </select>
+                {showCreateUser ? '❌ Cancel' : '➕ Create New User'}
+              </button>
             </div>
-            <button type="submit" disabled={loading} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>
-              {loading ? 'Creating...' : 'Create User'}
-            </button>
-          </form>
+          )}
+
+          {activeTab === 'users' && showCreateUser && (
+            <div className="glass-card p-4 mb-4">
+              <h5 className="mb-4">👤 Create New User</h5>
+                <form onSubmit={handleCreateUser}>
+                  <div className="row">
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Username</label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        value={createUserData.username}
+                        onChange={(e) => setCreateUserData({ ...createUserData, username: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Email</label>
+                      <input
+                        type="email"
+                        className="form-control"
+                        value={createUserData.email}
+                        onChange={(e) => setCreateUserData({ ...createUserData, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Password</label>
+                      <input
+                        type="password"
+                        className="form-control"
+                        value={createUserData.password}
+                        onChange={(e) => setCreateUserData({ ...createUserData, password: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">Role</label>
+                      <select
+                        className="form-select"
+                        value={createUserData.role}
+                        onChange={(e) => setCreateUserData({ ...createUserData, role: e.target.value })}
+                      >
+                        <option value="User">User</option>
+                        <option value="Admin">Admin</option>
+                      </select>
+                    </div>
+                  </div>
+                  <button type="submit" className="btn btn-primary btn-lg rounded-pill px-5" disabled={loading}>
+                    {loading ? '⏳ Creating...' : '🚀 Create User'}
+                  </button>
+                </form>
+            </div>
+          )}
+
+          {message && (
+            <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-danger'} rounded-pill`}>
+              {message}
+            </div>
+          )}
+
+          {activeTab === 'ledgers' && (
+            <div className="table-glass">
+              <div className="p-4 border-bottom">
+                <h5 className="mb-0 fw-bold">⏳ Pending Ledgers</h5>
+              </div>
+              <div className="p-0">
+                {pendingLedgers.length === 0 ? (
+                  <div className="text-center p-5">
+                    <div className="fs-1 opacity-25 mb-3">📄</div>
+                    <h6 className="text-muted">No pending ledgers</h6>
+                    <p className="text-muted small">All ledgers have been processed!</p>
+                  </div>
+                ) : (
+                  <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                      <thead className="bg-light">
+                        <tr>
+                          <th className="fw-semibold py-3">User</th>
+                          <th className="fw-semibold py-3">Amount</th>
+                          <th className="fw-semibold py-3">Description</th>
+                          <th className="fw-semibold py-3">Created</th>
+                          <th className="fw-semibold py-3">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {pendingLedgers.map((ledger) => (
+                          <tr key={ledger.id}>
+                            <td className="py-3 fw-semibold">{ledger.user?.username}</td>
+                            <td className="py-3">
+                              <span className="fw-bold text-success fs-5">${ledger.amount.toFixed(2)}</span>
+                            </td>
+                            <td className="py-3">{ledger.description}</td>
+                            <td className="py-3 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
+                            <td className="py-3">
+                              <button
+                                className="btn btn-success btn-sm rounded-pill me-2 px-3"
+                                onClick={() => handleApprove(ledger.id)}
+                              >
+                                ✅ Approve
+                              </button>
+                              <button
+                                className="btn btn-danger btn-sm rounded-pill px-3"
+                                onClick={() => handleReject(ledger.id)}
+                              >
+                                ❌ Reject
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'users' && (
+            <div className="table-glass">
+              <div className="p-4 border-bottom">
+                <h5 className="mb-0 fw-bold">👥 All Users</h5>
+              </div>
+              <div className="p-0">
+                <div className="table-responsive">
+                  <table className="table table-hover mb-0">
+                    <thead className="bg-light">
+                      <tr>
+                        <th className="fw-semibold py-3">Username</th>
+                        <th className="fw-semibold py-3">Email</th>
+                        <th className="fw-semibold py-3">Role</th>
+                        <th className="fw-semibold py-3">Wallet Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {users.map((user) => (
+                        <tr key={user.id}>
+                          <td className="py-3 fw-semibold">{user.username}</td>
+                          <td className="py-3">{user.email}</td>
+                          <td className="py-3">
+                            <span className={`badge rounded-pill px-3 py-2 ${user.role === 'Admin' ? 'bg-danger' : 'bg-primary'}`}>
+                              {user.role === 'Admin' ? '👑' : '👤'} {user.role}
+                            </span>
+                          </td>
+                          <td className="py-3">
+                            <span className="fw-bold text-success fs-5">${user.walletAmount.toFixed(2)}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-      )}
-
-      {message && (
-        <div style={{ padding: '10px', backgroundColor: message.includes('success') ? '#d4edda' : '#f8d7da', color: message.includes('success') ? '#155724' : '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
-          {message}
-        </div>
-      )}
-
-      <div style={{ marginBottom: '30px' }}>
-        <h3>Pending Ledgers</h3>
-        {pendingLedgers.length === 0 ? (
-          <p>No pending ledgers.</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>User</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Amount</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Description</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Created</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {pendingLedgers.map((ledger) => (
-                <tr key={ledger.id}>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{ledger.user?.username}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>${ledger.amount.toFixed(2)}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{ledger.description}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{new Date(ledger.createdAt).toLocaleDateString()}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                    <button
-                      onClick={() => handleApprove(ledger.id)}
-                      style={{ padding: '5px 10px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', marginRight: '5px' }}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleReject(ledger.id)}
-                      style={{ padding: '5px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      <div>
-        <h3>All Users</h3>
-        <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f8f9fa' }}>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Username</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Email</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Role</th>
-              <th style={{ padding: '10px', border: '1px solid #ddd' }}>Wallet Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.username}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.email}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>{user.role}</td>
-                <td style={{ padding: '10px', border: '1px solid #ddd' }}>${user.walletAmount.toFixed(2)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ledgerService, userService } from '../services/api';
-import { Ledger, User, LedgerUploadRequest } from '../types';
+import type { Ledger, User, LedgerUploadRequest } from '../types';
+import Navbar from './Navbar';
 
 interface UserDashboardProps {
   user: User;
@@ -17,6 +18,7 @@ const UserDashboard = ({ user: initialUser, onLogout }: UserDashboardProps) => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [activeTab, setActiveTab] = useState('ledgers');
 
   useEffect(() => {
     loadLedgers();
@@ -60,101 +62,136 @@ const UserDashboard = ({ user: initialUser, onLogout }: UserDashboardProps) => {
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-        <h2>User Dashboard</h2>
-        <button onClick={onLogout} style={{ padding: '8px 16px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px' }}>
-          Logout
-        </button>
-      </div>
-
-      <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-        <h3>Profile</h3>
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
-        <p><strong>Wallet Amount:</strong> ${user.walletAmount.toFixed(2)}</p>
-      </div>
-
-      <div style={{ marginBottom: '20px' }}>
-        <button
-          onClick={() => setShowUploadForm(!showUploadForm)}
-          style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px' }}
-        >
-          {showUploadForm ? 'Cancel' : 'Upload Ledger'}
-        </button>
-      </div>
-
-      {showUploadForm && (
-        <div style={{ backgroundColor: '#f8f9fa', padding: '15px', borderRadius: '8px', marginBottom: '20px' }}>
-          <h4>Upload Ledger</h4>
-          <form onSubmit={handleUpload}>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Amount:</label>
-              <input
-                type="number"
-                step="0.01"
-                value={uploadData.amount}
-                onChange={(e) => setUploadData({ ...uploadData, amount: parseFloat(e.target.value) })}
-                required
-                style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-              />
+    <div className="App">
+      <Navbar user={user} onLogout={onLogout} activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="content-area">
+        <div className="container-fluid px-3 py-3">
+          {user.role === 'User' && (
+            <div className="row mb-4">
+              <div className="col-md-6 mb-3">
+                <div className="stats-card p-4 h-100">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div>
+                      <h6 className="text-muted mb-1">💰 Wallet Balance</h6>
+                      <h2 className="text-success mb-0 fw-bold">${user.walletAmount.toFixed(2)}</h2>
+                    </div>
+                    <div className="fs-1 opacity-25">💳</div>
+                  </div>
+                </div>
+              </div>
+              <div className="col-md-6 mb-3">
+                <div className="stats-card p-4 h-100">
+                  <div className="d-flex align-items-center justify-content-between">
+                    <div>
+                      <h6 className="text-muted mb-1">📊 Total Ledgers</h6>
+                      <h2 className="text-primary mb-0 fw-bold">{ledgers.length}</h2>
+                    </div>
+                    <div className="fs-1 opacity-25">📋</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style={{ marginBottom: '15px' }}>
-              <label>Description:</label>
-              <textarea
-                value={uploadData.description}
-                onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
-                style={{ width: '100%', padding: '8px', marginTop: '5px', minHeight: '80px' }}
-              />
+          )}
+
+          {user.role === 'User' && (
+            <div className="mb-4">
+              <button
+                className={`btn ${showUploadForm ? 'btn-secondary' : 'btn-glass'} rounded-pill px-4 py-2`}
+                onClick={() => setShowUploadForm(!showUploadForm)}
+              >
+                {showUploadForm ? '❌ Cancel' : '➕ Upload New Ledger'}
+              </button>
             </div>
-            <button type="submit" disabled={loading} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>
-              {loading ? 'Uploading...' : 'Upload'}
-            </button>
-          </form>
-        </div>
-      )}
+          )}
 
-      {message && (
-        <div style={{ padding: '10px', backgroundColor: message.includes('success') ? '#d4edda' : '#f8d7da', color: message.includes('success') ? '#155724' : '#721c24', borderRadius: '4px', marginBottom: '20px' }}>
-          {message}
-        </div>
-      )}
+          {user.role === 'User' && showUploadForm && (
+            <div className="glass-card p-4 mb-4">
+              <h5 className="mb-4">📝 Upload New Ledger</h5>
+              <form onSubmit={handleUpload}>
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold">Amount ($)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      className="form-control form-control-lg rounded-pill"
+                      value={uploadData.amount}
+                      onChange={(e) => setUploadData({ ...uploadData, amount: parseFloat(e.target.value) })}
+                      placeholder="Enter amount"
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6 mb-3">
+                    <label className="form-label fw-semibold">Description</label>
+                    <textarea
+                      className="form-control form-control-lg rounded-3"
+                      rows={3}
+                      value={uploadData.description}
+                      onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
+                      placeholder="Enter description"
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary btn-lg rounded-pill px-5" disabled={loading}>
+                  {loading ? '⏳ Uploading...' : '🚀 Upload Ledger'}
+                </button>
+              </form>
+            </div>
+          )}
 
-      <div>
-        <h3>My Ledgers</h3>
-        {ledgers.length === 0 ? (
-          <p>No ledgers found.</p>
-        ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse', border: '1px solid #ddd' }}>
-            <thead>
-              <tr style={{ backgroundColor: '#f8f9fa' }}>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Amount</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Description</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Status</th>
-                <th style={{ padding: '10px', border: '1px solid #ddd' }}>Created</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ledgers.map((ledger) => (
-                <tr key={ledger.id}>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>${ledger.amount.toFixed(2)}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{ledger.description}</td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>
-                    <span style={{ 
-                      padding: '4px 8px', 
-                      borderRadius: '4px', 
-                      backgroundColor: ledger.status === 'Approved' ? '#d4edda' : ledger.status === 'Rejected' ? '#f8d7da' : '#fff3cd',
-                      color: ledger.status === 'Approved' ? '#155724' : ledger.status === 'Rejected' ? '#721c24' : '#856404'
-                    }}>
-                      {ledger.status}
-                    </span>
-                  </td>
-                  <td style={{ padding: '10px', border: '1px solid #ddd' }}>{new Date(ledger.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+          {message && (
+            <div className={`alert ${message.includes('success') ? 'alert-success' : 'alert-danger'} rounded-pill`}>
+              {message}
+            </div>
+          )}
+
+          <div className="table-glass">
+            <div className="p-4 border-bottom">
+              <h5 className="mb-0 fw-bold">📋 My Ledgers</h5>
+            </div>
+            <div className="p-0">
+              {ledgers.length === 0 ? (
+                <div className="text-center p-5">
+                  <div className="fs-1 opacity-25 mb-3">📄</div>
+                  <h6 className="text-muted">No ledgers found</h6>
+                  <p className="text-muted small">Upload your first ledger to get started!</p>
+                </div>
+              ) : (
+                <div className="table-responsive">
+                  <table className="table table-hover mb-0">
+                    <thead className="bg-light">
+                      <tr>
+                        <th className="fw-semibold py-3">Amount</th>
+                        <th className="fw-semibold py-3">Description</th>
+                        <th className="fw-semibold py-3">Status</th>
+                        <th className="fw-semibold py-3">Date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ledgers.map((ledger) => (
+                        <tr key={ledger.id}>
+                          <td className="py-3">
+                            <span className="fw-bold text-success fs-5">${ledger.amount.toFixed(2)}</span>
+                          </td>
+                          <td className="py-3">{ledger.description}</td>
+                          <td className="py-3">
+                            <span className={`badge rounded-pill px-3 py-2 ${
+                              ledger.status === 'Approved' ? 'bg-success' : 
+                              ledger.status === 'Rejected' ? 'bg-danger' : 'bg-warning text-dark'
+                            }`}>
+                              {ledger.status === 'Approved' ? '✅' : ledger.status === 'Rejected' ? '❌' : '⏳'} {ledger.status}
+                            </span>
+                          </td>
+                          <td className="py-3 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

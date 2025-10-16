@@ -2,9 +2,8 @@ import { useState, useEffect } from 'react';
 import Login from './components/Login';
 import UserDashboard from './components/UserDashboard';
 import AdminDashboard from './components/AdminDashboard';
-import { User } from './types';
+import type { User } from './types';
 import { userService } from './services/api';
-import './App.css';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -30,7 +29,7 @@ function App() {
     }
   };
 
-  const handleLogin = (token: string, userData: User) => {
+  const handleLogin = (_token: string, userData: User) => {
     setUser(userData);
   };
 
@@ -41,8 +40,12 @@ function App() {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div>Loading...</div>
+      <div className="loading-container">
+        <div className="loading-content">
+          <div className="loading-logo">💰</div>
+          <div className="loading-spinner-large"></div>
+          <div className="loading-text">Loading Saral Ledger...</div>
+        </div>
       </div>
     );
   }

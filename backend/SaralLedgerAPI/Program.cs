@@ -29,7 +29,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -38,7 +38,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
-// Add static files support for Vite
+// Add static files support
 builder.Services.AddSpaStaticFiles(configuration =>
 {
     configuration.RootPath = "wwwroot";
@@ -67,14 +67,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// Serve Vite React app
-app.UseSpa(spa =>
-{
-    spa.Options.SourcePath = "../frontend/saral-ledger-ui";
-    if (app.Environment.IsDevelopment())
-    {
-        spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
-    }
-});
+// Serve React app from wwwroot
+app.MapFallbackToFile("index.html");
 
 app.Run();
