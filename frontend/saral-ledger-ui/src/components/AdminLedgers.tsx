@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ledgerService } from '../services/api';
 import type { Ledger, User } from '../types';
 import RejectDialog from './RejectDialog';
+import { handleSort, filterAndSortLedgers, downloadFile, getSortIcon } from '../utils/tableUtils';
 
 interface AdminLedgersProps {
   user: User;
@@ -68,14 +69,7 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
   const handleDownload = async (ledger: Ledger) => {
     try {
       const blob = await ledgerService.downloadFile(ledger.id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = ledger.fileName || 'file';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      await downloadFile(blob, ledger.fileName || 'file');
     } catch (err) {
       setMessage('Failed to download file');
     }
@@ -85,42 +79,13 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
+  const handleSortClick = (field: string) => {
+    const sortConfig = handleSort(sortField, sortDirection, field);
+    setSortField(sortConfig.field);
+    setSortDirection(sortConfig.direction);
   };
 
-  const filteredAndSortedLedgers = allLedgers
-    .filter(ledger => 
-      ledger.id.toString().includes(filter) ||
-      ledger.user?.username.toLowerCase().includes(filter.toLowerCase()) ||
-      ledger.description.toLowerCase().includes(filter.toLowerCase()) ||
-      ledger.status.toLowerCase().includes(filter.toLowerCase())
-    )
-    .sort((a, b) => {
-      let aVal: any = a[sortField as keyof typeof a];
-      let bVal: any = b[sortField as keyof typeof b];
-      
-      if (sortField === 'user') {
-        aVal = a.user?.username || '';
-        bVal = b.user?.username || '';
-      }
-      
-      if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-      
-      if (sortDirection === 'asc') {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
+  const filteredAndSortedLedgers = filterAndSortLedgers(allLedgers, filter, sortField, sortDirection);
 
   return (
     <>
@@ -158,23 +123,23 @@ const AdminLedgers = ({ }: AdminLedgersProps) => {
                 <table className="table table-hover mb-0">
                   <thead className="bg-light">
                     <tr>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('id')}>
-                        ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('id')}>
+                        ID{getSortIcon(sortField, 'id', sortDirection)}
                       </th>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('user')}>
-                        User {sortField === 'user' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('user')}>
+                        User{getSortIcon(sortField, 'user', sortDirection)}
                       </th>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('amount')}>
-                        Amount {sortField === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('amount')}>
+                        Amount{getSortIcon(sortField, 'amount', sortDirection)}
                       </th>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('description')}>
-                        Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('description')}>
+                        Description{getSortIcon(sortField, 'description', sortDirection)}
                       </th>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('status')}>
-                        Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('status')}>
+                        Status{getSortIcon(sortField, 'status', sortDirection)}
                       </th>
-                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('createdAt')}>
-                        Date {sortField === 'createdAt' && (sortDirection === 'asc' ? '↑' : '↓')}
+                      <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('createdAt')}>
+                        Date{getSortIcon(sortField, 'createdAt', sortDirection)}
                       </th>
                       <th className="fw-semibold py-2">File</th>
                       <th className="fw-semibold py-2">Actions</th>

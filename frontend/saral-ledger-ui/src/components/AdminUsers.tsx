@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { userService } from '../services/api';
 import type { User, CreateUserRequest } from '../types';
+import { handleSort, filterAndSortUsers, getSortIcon } from '../utils/tableUtils';
 
 interface AdminUsersProps {
   user: User;
@@ -73,37 +74,13 @@ const AdminUsers = ({ }: AdminUsersProps) => {
     }
   };
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
+  const handleSortClick = (field: string) => {
+    const sortConfig = handleSort(sortField, sortDirection, field);
+    setSortField(sortConfig.field);
+    setSortDirection(sortConfig.direction);
   };
 
-  const filteredAndSortedUsers = users
-    .filter(user => 
-      user.id.toString().includes(filter) ||
-      user.username.toLowerCase().includes(filter.toLowerCase()) ||
-      (user.email?.toLowerCase().includes(filter.toLowerCase()) || false) ||
-      user.role.toLowerCase().includes(filter.toLowerCase())
-    )
-    .sort((a, b) => {
-      let aVal: any = a[sortField as keyof typeof a];
-      let bVal: any = b[sortField as keyof typeof b];
-      
-      if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-      
-      if (sortDirection === 'asc') {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
+  const filteredAndSortedUsers = filterAndSortUsers(users, filter, sortField, sortDirection);
 
   return (
     <>
@@ -236,20 +213,20 @@ const AdminUsers = ({ }: AdminUsersProps) => {
             <table className="table table-hover mb-0">
               <thead className="bg-light">
                 <tr>
-                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('id')}>
-                    ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('id')}>
+                    ID{getSortIcon(sortField, 'id', sortDirection)}
                   </th>
-                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('username')}>
-                    Username {sortField === 'username' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('username')}>
+                    Username{getSortIcon(sortField, 'username', sortDirection)}
                   </th>
-                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('email')}>
-                    Email {sortField === 'email' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('email')}>
+                    Email{getSortIcon(sortField, 'email', sortDirection)}
                   </th>
-                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('role')}>
-                    Role {sortField === 'role' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('role')}>
+                    Role{getSortIcon(sortField, 'role', sortDirection)}
                   </th>
-                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('walletAmount')}>
-                    Wallet {sortField === 'walletAmount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                  <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('walletAmount')}>
+                    Wallet{getSortIcon(sortField, 'walletAmount', sortDirection)}
                   </th>
                 </tr>
               </thead>

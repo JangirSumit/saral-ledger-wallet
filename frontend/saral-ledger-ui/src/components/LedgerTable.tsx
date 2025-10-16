@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Ledger } from '../types';
+import { handleSort, filterAndSortLedgers, getSortIcon } from '../utils/tableUtils';
 
 interface LedgerTableProps {
   ledgers: Ledger[];
@@ -19,36 +20,13 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
     setExpandedCard(expandedCard === id ? null : id);
   };
 
-  const handleSort = (field: string) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('asc');
-    }
+  const handleSortClick = (field: string) => {
+    const sortConfig = handleSort(sortField, sortDirection, field);
+    setSortField(sortConfig.field);
+    setSortDirection(sortConfig.direction);
   };
 
-  const filteredAndSortedLedgers = ledgers
-    .filter(ledger => 
-      ledger.id.toString().includes(filter) ||
-      ledger.description.toLowerCase().includes(filter.toLowerCase()) ||
-      ledger.status.toLowerCase().includes(filter.toLowerCase())
-    )
-    .sort((a, b) => {
-      let aVal: any = a[sortField as keyof typeof a];
-      let bVal: any = b[sortField as keyof typeof b];
-      
-      if (typeof aVal === 'string') {
-        aVal = aVal.toLowerCase();
-        bVal = bVal.toLowerCase();
-      }
-      
-      if (sortDirection === 'asc') {
-        return aVal > bVal ? 1 : -1;
-      } else {
-        return aVal < bVal ? 1 : -1;
-      }
-    });
+  const filteredAndSortedLedgers = filterAndSortLedgers(ledgers, filter, sortField, sortDirection);
 
   return (
     <div className="table-glass">
@@ -79,20 +57,20 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = fals
               <table className="table table-hover mb-0">
                 <thead className="bg-light">
                   <tr>
-                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('id')}>
-                      ID {sortField === 'id' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('id')}>
+                      ID{getSortIcon(sortField, 'id', sortDirection)}
                     </th>
-                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('amount')}>
-                      Amount {sortField === 'amount' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('amount')}>
+                      Amount{getSortIcon(sortField, 'amount', sortDirection)}
                     </th>
-                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('description')}>
-                      Description {sortField === 'description' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('description')}>
+                      Description{getSortIcon(sortField, 'description', sortDirection)}
                     </th>
-                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('status')}>
-                      Status {sortField === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('status')}>
+                      Status{getSortIcon(sortField, 'status', sortDirection)}
                     </th>
-                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSort('createdAt')}>
-                      Date {sortField === 'createdAt' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('createdAt')}>
+                      Date{getSortIcon(sortField, 'createdAt', sortDirection)}
                     </th>
                     <th className="fw-semibold py-2">File</th>
                     {showActions && <th className="fw-semibold py-2">Actions</th>}
