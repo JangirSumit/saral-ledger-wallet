@@ -14,6 +14,7 @@ export interface Ledger {
   status: 'Pending' | 'Approved' | 'Rejected';
   createdAt: string;
   approvedAt?: string;
+  fileName?: string;
   user?: User;
 }
 

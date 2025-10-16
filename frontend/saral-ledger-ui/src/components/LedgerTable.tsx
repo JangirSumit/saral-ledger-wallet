@@ -4,10 +4,11 @@ interface LedgerTableProps {
   ledgers: Ledger[];
   onEdit?: (ledger: Ledger) => void;
   onDelete?: (ledger: Ledger) => void;
+  onDownload?: (ledger: Ledger) => void;
   showActions?: boolean;
 }
 
-const LedgerTable = ({ ledgers, onEdit, onDelete, showActions = false }: LedgerTableProps) => {
+const LedgerTable = ({ ledgers, onEdit, onDelete, onDownload, showActions = false }: LedgerTableProps) => {
   return (
     <div className="table-glass">
       <div className="p-4 border-bottom">
@@ -29,6 +30,7 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, showActions = false }: LedgerT
                   <th className="fw-semibold py-2">Description</th>
                   <th className="fw-semibold py-2">Status</th>
                   <th className="fw-semibold py-2">Date</th>
+                  <th className="fw-semibold py-2">File</th>
                   {showActions && <th className="fw-semibold py-2">Actions</th>}
                 </tr>
               </thead>
@@ -48,6 +50,18 @@ const LedgerTable = ({ ledgers, onEdit, onDelete, showActions = false }: LedgerT
                       </span>
                     </td>
                     <td className="py-2 text-muted">{new Date(ledger.createdAt).toLocaleDateString()}</td>
+                    <td className="py-2">
+                      {ledger.fileName ? (
+                        <button
+                          className="btn btn-outline-info btn-sm rounded-pill px-3"
+                          onClick={() => onDownload?.(ledger)}
+                        >
+                          📎 Download
+                        </button>
+                      ) : (
+                        <span className="text-muted small">No file</span>
+                      )}
+                    </td>
                     {showActions && (
                       <td className="py-2">
                         {ledger.status === 'Pending' && (

@@ -60,31 +60,44 @@ const LedgerUploadModal = ({ show, onClose, onSubmit, loading, editData }: Ledge
                   />
                 </div>
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-semibold">Description</label>
+                  <label className="form-label fw-semibold">Description *</label>
                   <textarea
                     className="form-control form-control-lg rounded-3"
                     rows={3}
                     value={uploadData.description}
                     onChange={(e) => setUploadData({ ...uploadData, description: e.target.value })}
-                    placeholder="Enter description"
+                    placeholder="Enter transaction details (bank name, account number, transaction ID, etc.)"
+                    required
                   />
+                  <small className="text-muted mt-1 d-block">
+                    📝 Please include: Bank name, Account details, Transaction ID, Purpose of transaction
+                  </small>
                 </div>
                 <div className="col-12 mb-3">
-                  <label className="form-label fw-semibold">Evidence File (Optional)</label>
+                  <label className="form-label fw-semibold">Evidence File *</label>
                   <div className="file-upload-wrapper">
                     <input
                       type="file"
                       className="form-control form-control-lg"
                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                       onChange={(e) => setUploadData({ ...uploadData, file: e.target.files?.[0] })}
+                      required={!editData}
                     />
                     <small className="text-muted mt-1 d-block">
                       📎 Supported formats: PDF, JPG, PNG, DOC, DOCX (Max 5MB)
+                      {editData && <><br/>📝 Leave empty to keep existing file</>}
                     </small>
                     {uploadData.file && (
                       <div className="selected-file mt-2">
                         <span className="badge bg-primary rounded-pill">
                           📄 {uploadData.file.name}
+                        </span>
+                      </div>
+                    )}
+                    {editData?.fileName && !uploadData.file && (
+                      <div className="existing-file mt-2">
+                        <span className="badge bg-success rounded-pill">
+                          📄 {editData.fileName} (Current file)
                         </span>
                       </div>
                     )}

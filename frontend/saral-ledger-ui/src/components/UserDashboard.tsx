@@ -95,6 +95,22 @@ const UserDashboard = ({ user: initialUser, onLogout }: UserDashboardProps) => {
     }
   };
 
+  const handleDownload = async (ledger: Ledger) => {
+    try {
+      const blob = await ledgerService.downloadFile(ledger.id);
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = ledger.fileName || `ledger-${ledger.id}-file`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err: any) {
+      setMessage('File download failed');
+    }
+  };
+
   return (
     <div className="App">
       <Navbar user={user} onLogout={onLogout} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -134,6 +150,7 @@ const UserDashboard = ({ user: initialUser, onLogout }: UserDashboardProps) => {
             ledgers={ledgers} 
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onDownload={handleDownload}
             showActions={true}
           />
 

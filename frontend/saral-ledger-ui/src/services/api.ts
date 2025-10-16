@@ -74,6 +74,13 @@ export const ledgerService = {
     const response = await api.put(`/ledger/${id}`, data);
     return response.data;
   },
+
+  downloadFile: async (id: number): Promise<Blob> => {
+    const response = await api.get(`/ledger/${id}/download`, {
+      responseType: 'blob'
+    });
+    return response.data;
+  },
 };
 
 export const adminService = {
