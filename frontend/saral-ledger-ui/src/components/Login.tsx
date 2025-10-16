@@ -37,9 +37,9 @@ const Login = ({ onLogin }: LoginProps) => {
           <div className="login-header">
             <div className="brand-logo">
               <div className="logo-icon">💰</div>
-              <h1 className="brand-title">Saral Ledger</h1>
+              <h1 className="brand-title">SaralPay</h1>
             </div>
-            <p className="login-subtitle">Welcome back! Please sign in to your account</p>
+            <p className="login-subtitle">Upload ledgers, earn wallet money - Simple & Fast!</p>
           </div>
           
           <form onSubmit={handleSubmit} className="login-form">
