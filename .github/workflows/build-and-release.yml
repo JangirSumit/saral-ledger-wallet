@@ -44,7 +44,7 @@ jobs:
     - name: Create release artifact
       run: |
         mkdir release-artifacts
-        powershell Compress-Archive -Path backend/SaralLedgerAPI/publish -DestinationPath release-artifacts/saral-ledger-wallet.zip
+        powershell Compress-Archive -Path backend/SaralLedgerAPI/publish/* -DestinationPath release-artifacts/saral-ledger-wallet.zip
     
     - name: Upload artifact
       uses: actions/upload-artifact@v4

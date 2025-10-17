@@ -46,10 +46,11 @@ builder.Services.AddSpaStaticFiles(configuration =>
 
 var app = builder.Build();
 
-// Seed the database
+// Ensure database is created and migrated
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    context.Database.EnsureCreated();
     SeedData.Initialize(context);
 }
 
