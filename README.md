@@ -29,12 +29,8 @@ A full-stack application with React frontend and .NET backend for ledger managem
 ### Using Pre-built Binaries
 
 1. Download the latest release from [GitHub Releases](../../releases)
-2. Extract the appropriate zip file for your platform:
-   - `saral-ledger-wallet-windows-x64.zip` for Windows
-   - `saral-ledger-wallet-linux-x64.zip` for Linux
-3. Run the executable:
-   - Windows: `SaralLedgerAPI.exe`
-   - Linux: `./SaralLedgerAPI`
+2. Extract `saral-ledger-wallet.zip`
+3. Run `SaralLedgerAPI.exe`
 4. Open your browser to `https://localhost:7000`
 
 ### Development Setup

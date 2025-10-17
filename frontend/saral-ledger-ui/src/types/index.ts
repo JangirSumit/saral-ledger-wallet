@@ -42,3 +42,8 @@ export interface CreateUserRequest {
   password: string;
   role: string;
 }
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}

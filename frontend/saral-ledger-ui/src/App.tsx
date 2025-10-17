@@ -6,11 +6,13 @@ import AdminLedgers from './components/AdminLedgers';
 import AdminUsers from './components/AdminUsers';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import ChangePasswordModal from './components/ChangePasswordModal';
 import type { User } from './types';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showChangePassword, setShowChangePassword] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,7 +51,7 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar user={user} onLogout={handleLogout} />
+      <Navbar user={user} onLogout={handleLogout} onChangePassword={() => setShowChangePassword(true)} />
       <div className="content-area">
         <div className="container-fluid px-3 py-3">
           <Routes>
@@ -67,6 +69,12 @@ function App() {
         </div>
       </div>
       <Footer />
+      
+      <ChangePasswordModal
+        isOpen={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+        onSuccess={() => {}}
+      />
     </div>
   );
 }

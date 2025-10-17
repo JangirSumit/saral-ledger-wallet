@@ -5,9 +5,10 @@ import type { User } from '../types';
 interface NavbarProps {
   user: User;
   onLogout: () => void;
+  onChangePassword: () => void;
 }
 
-const Navbar = ({ user, onLogout }: NavbarProps) => {
+const Navbar = ({ user, onLogout, onChangePassword }: NavbarProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
@@ -100,6 +101,15 @@ const Navbar = ({ user, onLogout }: NavbarProps) => {
                   )}
                 </div>
                 <hr />
+                <button 
+                  className="btn btn-outline-primary w-100 rounded-pill mb-2" 
+                  onClick={() => {
+                    onChangePassword();
+                    setShowDropdown(false);
+                  }}
+                >
+                  🔐 Change Password
+                </button>
                 <button className="btn btn-danger w-100 rounded-pill" onClick={onLogout}>
                   🚪 Logout
                 </button>

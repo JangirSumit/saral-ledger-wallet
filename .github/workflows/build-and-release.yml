@@ -38,38 +38,25 @@ jobs:
       working-directory: backend/SaralLedgerAPI
     
     - name: Publish backend (Windows x64)
-      run: dotnet publish -c Release -r win-x64 --self-contained -o publish/win-x64
+      run: dotnet publish -c Release -r win-x64 --self-contained -o publish
       working-directory: backend/SaralLedgerAPI
     
-    - name: Publish backend (Linux x64)
-      run: dotnet publish -c Release -r linux-x64 --self-contained -o publish/linux-x64
-      working-directory: backend/SaralLedgerAPI
-    
-    - name: Create release artifacts
+    - name: Create release artifact
       run: |
         mkdir release-artifacts
-        powershell Compress-Archive -Path backend/SaralLedgerAPI/publish/win-x64/* -DestinationPath release-artifacts/saral-ledger-wallet-windows-x64.zip
-        powershell Compress-Archive -Path backend/SaralLedgerAPI/publish/linux-x64/* -DestinationPath release-artifacts/saral-ledger-wallet-linux-x64.zip
+        powershell Compress-Archive -Path backend/SaralLedgerAPI/publish -DestinationPath release-artifacts/saral-ledger-wallet.zip
     
-    - name: Upload Windows artifact
+    - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: saral-ledger-wallet-windows-x64
-        path: release-artifacts/saral-ledger-wallet-windows-x64.zip
-    
-    - name: Upload Linux artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: saral-ledger-wallet-linux-x64
-        path: release-artifacts/saral-ledger-wallet-linux-x64.zip
+        name: saral-ledger-wallet
+        path: release-artifacts/saral-ledger-wallet.zip
     
     - name: Create Release
       if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
-        files: |
-          release-artifacts/saral-ledger-wallet-windows-x64.zip
-          release-artifacts/saral-ledger-wallet-linux-x64.zip
+        files: release-artifacts/saral-ledger-wallet.zip
         generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

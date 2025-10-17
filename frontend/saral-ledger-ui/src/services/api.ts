@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { AuthResponse, LoginRequest, User, Ledger, LedgerCreateRequest, CreateUserRequest } from '../types';
+import type { AuthResponse, LoginRequest, User, Ledger, LedgerCreateRequest, CreateUserRequest, ChangePasswordRequest } from '../types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -35,6 +35,11 @@ export const userService = {
 
   getAllUsers: async (): Promise<User[]> => {
     const response = await api.get('/user/all');
+    return response.data;
+  },
+
+  changePassword: async (data: ChangePasswordRequest): Promise<{ message: string }> => {
+    const response = await api.post('/user/change-password', data);
     return response.data;
   },
 };
