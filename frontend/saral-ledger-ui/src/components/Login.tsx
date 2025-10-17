@@ -158,6 +158,11 @@ const Login = ({ onLogin }: LoginProps) => {
               <span className="security-item">📊 Audit trails</span>
             </div>
           </div>
+          
+          <div className="help-notice">
+            <div className="help-text">💡 Forgot password or facing login issues?</div>
+            <div className="help-contact">Contact your administrator for password reset assistance</div>
+          </div>
         </div>
       </div>
     </div>

@@ -63,6 +63,23 @@ namespace SaralLedgerAPI.Controllers
             return Ok(users);
         }
 
+        [HttpPost("reset-password/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ResetPassword(int userId, [FromBody] ResetPasswordRequest request)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return NotFound("User not found");
+
+            if (!IsStrongPassword(request.NewPassword))
+                return BadRequest("Password must be at least 8 characters with uppercase, lowercase, number and special character");
+
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Password reset successfully" });
+        }
+
         [HttpPost("change-password")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
         {
@@ -200,6 +217,11 @@ namespace SaralLedgerAPI.Controllers
     public class ChangePasswordRequest
     {
         public string CurrentPassword { get; set; } = string.Empty;
+        public string NewPassword { get; set; } = string.Empty;
+    }
+
+    public class ResetPasswordRequest
+    {
         public string NewPassword { get; set; } = string.Empty;
     }
 

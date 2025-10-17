@@ -1,11 +1,63 @@
 import { useState, useEffect } from 'react';
 import { userService } from '../services/api';
 import type { User, CreateUserRequest } from '../types';
+import ResetPasswordModal from './ResetPasswordModal';
 import { handleSort, filterAndSortUsers, getSortIcon } from '../utils/tableUtils';
 
 interface AdminUsersProps {
   user: User;
 }
+
+interface UserCardProps {
+  user: User;
+  onResetPassword: (user: { id: number; username: string }) => void;
+}
+
+const UserCard = ({ user, onResetPassword }: UserCardProps) => {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="ledger-card">
+      <div className="ledger-card-header" onClick={() => setExpanded(!expanded)}>
+        <div className="d-flex justify-content-between align-items-center">
+          <div>
+            <div className="fw-bold">#{user.id} - {user.username}</div>
+            <div className="text-muted small">{user.email}</div>
+          </div>
+          <div className="d-flex align-items-center gap-2">
+            <span className={`badge rounded-pill ${user.role === 'Admin' ? 'bg-danger' : 'bg-primary'}`}>
+              {user.role}
+            </span>
+            <span className="expand-icon" style={{ transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+              ▼
+            </span>
+          </div>
+        </div>
+      </div>
+      {expanded && (
+        <div className="ledger-card-body">
+          <div className="row g-2">
+            <div className="col-6">
+              <small className="text-muted">Wallet Amount</small>
+              <div className="fw-bold text-success">₹{user.walletAmount.toFixed(2)}</div>
+            </div>
+            <div className="col-6">
+              <small className="text-muted">Actions</small>
+              <div>
+                <button
+                  className="btn btn-outline-warning btn-sm rounded-pill"
+                  onClick={() => onResetPassword({ id: user.id, username: user.username })}
+                >
+                  🔑 Reset Password
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const AdminUsers = ({ }: AdminUsersProps) => {
   const [users, setUsers] = useState<User[]>([]);
@@ -22,6 +74,7 @@ const AdminUsers = ({ }: AdminUsersProps) => {
   const [filter, setFilter] = useState('');
   const [sortField, setSortField] = useState<string>('id');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [resetPasswordUser, setResetPasswordUser] = useState<{ id: number; username: string } | null>(null);
 
   useEffect(() => {
     loadUsers();
@@ -209,7 +262,8 @@ const AdminUsers = ({ }: AdminUsersProps) => {
           </div>
         </div>
         <div className="p-0">
-          <div className="table-responsive">
+          {/* Desktop Table */}
+          <div className="table-responsive d-none d-md-block">
             <table className="table table-hover mb-0">
               <thead className="bg-light">
                 <tr>
@@ -228,6 +282,7 @@ const AdminUsers = ({ }: AdminUsersProps) => {
                   <th className="fw-semibold py-2 cursor-pointer" onClick={() => handleSortClick('walletAmount')}>
                     Wallet{getSortIcon(sortField, 'walletAmount', sortDirection)}
                   </th>
+                  <th className="fw-semibold py-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -244,13 +299,42 @@ const AdminUsers = ({ }: AdminUsersProps) => {
                     <td className="py-2">
                       <span className="fw-bold text-success">₹{u.walletAmount.toFixed(2)}</span>
                     </td>
+                    <td className="py-2">
+                      <button
+                        className="btn btn-outline-warning btn-sm rounded-pill"
+                        onClick={() => setResetPasswordUser({ id: u.id, username: u.username })}
+                        title="Reset Password"
+                      >
+                        🔑 Reset
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Cards */}
+          <div className="d-md-none">
+            {filteredAndSortedUsers.map((u) => (
+              <UserCard key={u.id} user={u} onResetPassword={setResetPasswordUser} />
+            ))}
+          </div>
         </div>
       </div>
+
+      {resetPasswordUser && (
+        <ResetPasswordModal
+          isOpen={true}
+          onClose={() => setResetPasswordUser(null)}
+          userId={resetPasswordUser.id}
+          username={resetPasswordUser.username}
+          onSuccess={() => {
+            setMessage('Password reset successfully!');
+            setTimeout(() => setMessage(''), 3000);
+          }}
+        />
+      )}
     </>
   );
 };

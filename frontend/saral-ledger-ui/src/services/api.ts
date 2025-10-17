@@ -130,4 +130,9 @@ export const adminService = {
     const response = await api.put(`/user/${id}`, data);
     return response.data;
   },
+
+  resetPassword: async (userId: number, newPassword: string): Promise<{ message: string }> => {
+    const response = await api.post(`/user/reset-password/${userId}`, { newPassword });
+    return response.data;
+  },
 };
