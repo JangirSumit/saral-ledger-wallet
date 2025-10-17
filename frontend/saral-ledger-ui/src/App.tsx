@@ -7,19 +7,28 @@ import AdminUsers from './components/AdminUsers';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import MfaSetupModal from './components/MfaSetupModal';
+import MfaDisableModal from './components/MfaDisableModal';
 import type { User } from './types';
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [showChangePassword, setShowChangePassword] = useState(false);
+  const [showMfaSetup, setShowMfaSetup] = useState(false);
+  const [showMfaDisable, setShowMfaDisable] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
-    if (token && userData) {
-      setUser(JSON.parse(userData));
+    if (token && userData && userData !== 'undefined') {
+      try {
+        setUser(JSON.parse(userData));
+      } catch (error) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
     }
     setLoading(false);
   }, []);
@@ -51,7 +60,18 @@ function App() {
 
   return (
     <div className="App">
-      <Navbar user={user} onLogout={handleLogout} onChangePassword={() => setShowChangePassword(true)} />
+      <Navbar 
+        user={user} 
+        onLogout={handleLogout} 
+        onChangePassword={() => setShowChangePassword(true)}
+        onMfaSetup={() => {
+          if (user.mfaEnabled) {
+            setShowMfaDisable(true);
+          } else {
+            setShowMfaSetup(true);
+          }
+        }}
+      />
       <div className="content-area">
         <div className="container-fluid px-3 py-3">
           <Routes>
@@ -74,6 +94,30 @@ function App() {
         isOpen={showChangePassword}
         onClose={() => setShowChangePassword(false)}
         onSuccess={() => {}}
+      />
+      
+      <MfaSetupModal
+        isOpen={showMfaSetup}
+        onClose={() => setShowMfaSetup(false)}
+        onSuccess={() => {
+          if (user) {
+            const updatedUser = { ...user, mfaEnabled: true };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }}
+      />
+      
+      <MfaDisableModal
+        isOpen={showMfaDisable}
+        onClose={() => setShowMfaDisable(false)}
+        onSuccess={() => {
+          if (user) {
+            const updatedUser = { ...user, mfaEnabled: false };
+            setUser(updatedUser);
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+          }
+        }}
       />
     </div>
   );

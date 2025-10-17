@@ -6,9 +6,10 @@ interface NavbarProps {
   user: User;
   onLogout: () => void;
   onChangePassword: () => void;
+  onMfaSetup: () => void;
 }
 
-const Navbar = ({ user, onLogout, onChangePassword }: NavbarProps) => {
+const Navbar = ({ user, onLogout, onChangePassword, onMfaSetup }: NavbarProps) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
@@ -109,6 +110,15 @@ const Navbar = ({ user, onLogout, onChangePassword }: NavbarProps) => {
                   }}
                 >
                   🔐 Change Password
+                </button>
+                <button 
+                  className="btn btn-outline-success w-100 rounded-pill mb-2" 
+                  onClick={() => {
+                    onMfaSetup();
+                    setShowDropdown(false);
+                  }}
+                >
+                  {user.mfaEnabled ? '🔒 Manage MFA' : '📱 Setup MFA'}
                 </button>
                 <button className="btn btn-danger w-100 rounded-pill" onClick={onLogout}>
                   🚪 Logout

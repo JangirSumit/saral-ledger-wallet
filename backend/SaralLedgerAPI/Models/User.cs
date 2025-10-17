@@ -20,6 +20,10 @@ namespace SaralLedgerAPI.Models
         
         public decimal WalletAmount { get; set; } = 0;
         
+        public bool MfaEnabled { get; set; } = false;
+        
+        public string? MfaSecret { get; set; }
+        
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         
         public ICollection<Ledger> Ledgers { get; set; } = new List<Ledger>();

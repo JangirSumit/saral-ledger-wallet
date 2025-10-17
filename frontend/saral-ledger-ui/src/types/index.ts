@@ -4,6 +4,7 @@ export interface User {
   email?: string;
   role: string;
   walletAmount: number;
+  mfaEnabled?: boolean;
 }
 
 export interface Ledger {
@@ -21,13 +22,15 @@ export interface Ledger {
 }
 
 export interface AuthResponse {
-  token: string;
-  user: User;
+  token?: string;
+  user?: User;
+  requiresMfa?: boolean;
 }
 
 export interface LoginRequest {
   username: string;
   password: string;
+  mfaCode?: string;
 }
 
 export interface LedgerCreateRequest {

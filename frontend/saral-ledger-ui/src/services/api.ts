@@ -42,6 +42,21 @@ export const userService = {
     const response = await api.post('/user/change-password', data);
     return response.data;
   },
+
+  setupMfa: async (): Promise<{ secret: string; qrCodeUrl: string }> => {
+    const response = await api.post('/user/setup-mfa');
+    return response.data;
+  },
+
+  enableMfa: async (code: string): Promise<{ message: string }> => {
+    const response = await api.post('/user/enable-mfa', { code });
+    return response.data;
+  },
+
+  disableMfa: async (code: string): Promise<{ message: string }> => {
+    const response = await api.post('/user/disable-mfa', { code });
+    return response.data;
+  },
 };
 
 export const ledgerService = {

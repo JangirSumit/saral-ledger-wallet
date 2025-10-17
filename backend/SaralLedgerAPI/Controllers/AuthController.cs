@@ -30,8 +30,17 @@ namespace SaralLedgerAPI.Controllers
             if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
                 return Unauthorized();
 
+            if (user.MfaEnabled)
+            {
+                if (string.IsNullOrEmpty(request.MfaCode))
+                    return Ok(new { requiresMfa = true });
+                
+                if (!MfaHelper.VerifyTotp(user.MfaSecret!, request.MfaCode))
+                    return Unauthorized("Invalid MFA code");
+            }
+
             var token = GenerateJwtToken(user);
-            return Ok(new { token, user = new { user.Id, user.Username, user.Role, user.WalletAmount } });
+            return Ok(new { token, user = new { user.Id, user.Username, user.Role, user.WalletAmount, user.MfaEnabled } });
         }
 
         [HttpPost("register")]
@@ -81,6 +90,67 @@ namespace SaralLedgerAPI.Controllers
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+        public string? MfaCode { get; set; }
+    }
+
+    public static class MfaHelper
+    {
+        private const string Base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+        public static bool VerifyTotp(string secret, string code)
+        {
+            var secretBytes = FromBase32String(secret);
+            var unixTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var timeStep = unixTime / 30;
+            
+            for (int i = -1; i <= 1; i++)
+            {
+                var testCode = GenerateTotp(secretBytes, timeStep + i);
+                if (testCode == code) return true;
+            }
+            return false;
+        }
+
+        private static string GenerateTotp(byte[] secret, long timeStep)
+        {
+            var timeBytes = BitConverter.GetBytes(timeStep);
+            if (BitConverter.IsLittleEndian) Array.Reverse(timeBytes);
+            
+            using var hmac = new System.Security.Cryptography.HMACSHA1(secret);
+            var hash = hmac.ComputeHash(timeBytes);
+            var offset = hash[hash.Length - 1] & 0x0F;
+            var code = ((hash[offset] & 0x7F) << 24) |
+                      ((hash[offset + 1] & 0xFF) << 16) |
+                      ((hash[offset + 2] & 0xFF) << 8) |
+                      (hash[offset + 3] & 0xFF);
+            return (code % 1000000).ToString("D6");
+        }
+
+        private static byte[] FromBase32String(string base32)
+        {
+            if (string.IsNullOrEmpty(base32)) return new byte[0];
+            
+            var result = new List<byte>();
+            int buffer = 0;
+            int bitsLeft = 0;
+            
+            foreach (char c in base32.ToUpper())
+            {
+                int value = Base32Chars.IndexOf(c);
+                if (value < 0) continue;
+                
+                buffer = (buffer << 5) | value;
+                bitsLeft += 5;
+                
+                if (bitsLeft >= 8)
+                {
+                    result.Add((byte)(buffer >> (bitsLeft - 8)));
+                    bitsLeft -= 8;
+                }
+            }
+            
+            return result.ToArray();
+        }
     }
 
     public class RegisterRequest
