@@ -15,6 +15,7 @@ const Login = ({ onLogin }: LoginProps) => {
   const [loading, setLoading] = useState(false);
   const [requiresMfa, setRequiresMfa] = useState(false);
   const [mfaCode, setMfaCode] = useState('');
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,6 +47,21 @@ const Login = ({ onLogin }: LoginProps) => {
   return (
     <div className="login-container">
       <div className="login-background">
+        <div className="background-avatars">
+          <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-1" />
+          <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-2" />
+          <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-3" />
+          <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-4" />
+          <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-5" />
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face" alt="" className="avatar avatar-6" />
+        </div>
+        <div className="workflow-illustration">
+          <div className="workflow-step">📄</div>
+          <div className="workflow-arrow">→</div>
+          <div className="workflow-step">✅</div>
+          <div className="workflow-arrow">→</div>
+          <div className="workflow-step">💰</div>
+        </div>
         <div className="login-card">
           <div className="login-header">
             <div className="brand-logo">
@@ -159,10 +175,42 @@ const Login = ({ onLogin }: LoginProps) => {
             </div>
           </div>
           
-          <div className="help-notice">
-            <div className="help-text">💡 Forgot password or facing login issues?</div>
-            <div className="help-contact">Contact your administrator for password reset assistance</div>
+          <div className="text-center mt-3">
+            <button 
+              type="button" 
+              className="btn btn-link text-decoration-none p-0"
+              onClick={() => setShowForgotPassword(true)}
+            >
+              Forgot password?
+            </button>
           </div>
+          
+          {showForgotPassword && (
+            <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
+              <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h5 className="modal-title">🔑 Forgot Password?</h5>
+                    <button type="button" className="btn-close" onClick={() => setShowForgotPassword(false)}>✕</button>
+                  </div>
+                  <div className="modal-body text-center">
+                    <div className="mb-3">
+                      <div className="text-muted mb-2">Need help accessing your account?</div>
+                      <div className="fw-semibold">Contact your administrator for password reset assistance</div>
+                    </div>
+                    <div className="alert alert-info rounded-pill">
+                      📞 Your admin can reset your password from the Users management panel
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-primary rounded-pill px-4" onClick={() => setShowForgotPassword(false)}>
+                      Got it
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
